@@ -199,49 +199,49 @@ runs:
           gh api "repos/$DOL_REPO/pulls/$DOL_PR/files" --paginate \
             > "$RUNNER_TEMP/db-synapse-pr-files.json"
           python3 - "$RUNNER_TEMP/db-synapse-pr-files.json" "$DIFF" <<'PY'
-import json
-import sys
-from pathlib import Path
+          import json
+          import sys
+          from pathlib import Path
 
-def load_pages(text):
-    text = text.strip()
-    if not text:
-        return []
-    try:
-        data = json.loads(text)
-    except json.JSONDecodeError:
-        decoder = json.JSONDecoder()
-        items = []
-        index = 0
-        while index < len(text):
-            while index < len(text) and text[index].isspace():
-                index += 1
-            if index >= len(text):
-                break
-            value, index = decoder.raw_decode(text, index)
-            items.extend(value if isinstance(value, list) else [value])
-        return items
-    return data if isinstance(data, list) else [data]
+          def load_pages(text):
+              text = text.strip()
+              if not text:
+                  return []
+              try:
+                  data = json.loads(text)
+              except json.JSONDecodeError:
+                  decoder = json.JSONDecoder()
+                  items = []
+                  index = 0
+                  while index < len(text):
+                      while index < len(text) and text[index].isspace():
+                          index += 1
+                      if index >= len(text):
+                          break
+                      value, index = decoder.raw_decode(text, index)
+                      items.extend(value if isinstance(value, list) else [value])
+                  return items
+              return data if isinstance(data, list) else [data]
 
-files = load_pages(Path(sys.argv[1]).read_text(encoding="utf-8"))
-chunks = []
-skipped = []
-for item in files:
-    name = item.get("filename") or ""
-    if item.get("status") == "removed":
-        continue
-    patch = item.get("patch")
-    if not patch:
-        if name.endswith(".py"):
-            skipped.append(name)
-        continue
-    chunks.append(
-        f"diff --git a/{name} b/{name}\n--- a/{name}\n+++ b/{name}\n{patch}\n"
-    )
-Path(sys.argv[2]).write_text("".join(chunks), encoding="utf-8")
-if skipped:
-    print("::notice::no patch for " + ", ".join(skipped))
-PY
+          files = load_pages(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          chunks = []
+          skipped = []
+          for item in files:
+              name = item.get("filename") or ""
+              if item.get("status") == "removed":
+                  continue
+              patch = item.get("patch")
+              if not patch:
+                  if name.endswith(".py"):
+                      skipped.append(name)
+                  continue
+              chunks.append(
+                  f"diff --git a/{name} b/{name}\n--- a/{name}\n+++ b/{name}\n{patch}\n"
+              )
+          Path(sys.argv[2]).write_text("".join(chunks), encoding="utf-8")
+          if skipped:
+              print("::notice::no patch for " + ", ".join(skipped))
+          PY
           if [ ! -s "$DIFF" ]; then
             echo "::notice::no added tables or columns in this pull request"
             {
