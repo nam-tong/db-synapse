@@ -1,8 +1,4 @@
-**English** · [Русский](https://github.com/nam-tong/db-synapse/blob/main/docs/i18n/README.ru.md) · [Español](https://github.com/nam-tong/db-synapse/blob/main/docs/i18n/README.es.md) · [中文](https://github.com/nam-tong/db-synapse/blob/main/docs/i18n/README.zh.md)
-
 <div align="center" markdown="1">
-
-<img src="media/hero.png" alt="DB Synapse — live sidebar and ER diagram for your Django models" width="100%"/>
 
 <br/>
 <br/>
